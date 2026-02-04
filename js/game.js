@@ -158,6 +158,55 @@ function World() {
 				}
 			}
 		);
+
+		// Touch controls for mobile
+		var touchStartX = 0;
+		var touchStartY = 0;
+		var touchThreshold = 50;
+
+		document.addEventListener('touchstart', function(e) {
+			touchStartX = e.changedTouches[0].screenX;
+			touchStartY = e.changedTouches[0].screenY;
+		}, false);
+
+		document.addEventListener('touchend', function(e) {
+			var touchEndX = e.changedTouches[0].screenX;
+			var touchEndY = e.changedTouches[0].screenY;
+			var dx = touchEndX - touchStartX;
+			var dy = touchEndY - touchStartY;
+
+			if (gameOver) {
+				document.location.reload(true);
+				return;
+			}
+
+			if (paused && !collisionsDetected()) {
+				paused = false;
+				character.onUnpause();
+				document.getElementById("variable-content").style.visibility = "hidden";
+				document.getElementById("controls").style.display = "none";
+				return;
+			}
+
+			if (Math.abs(dx) > Math.abs(dy)) {
+				// Horizontal swipe
+				if (Math.abs(dx) > touchThreshold) {
+					if (dx > 0) {
+						character.onRightKeyPressed();
+					} else {
+						character.onLeftKeyPressed();
+					}
+				}
+			} else {
+				// Vertical swipe
+				if (Math.abs(dy) > touchThreshold) {
+					if (dy < 0) {
+						character.onUpKeyPressed();
+					}
+				}
+			}
+		}, false);
+
 		document.addEventListener(
 			'keyup',
 			function(e) {
